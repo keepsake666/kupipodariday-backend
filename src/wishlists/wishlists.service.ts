@@ -12,22 +12,22 @@ export class WishlistsService {
     private userRepository: Repository<Wishlist>,
   ) {}
   create(createWishlistDto: CreateWishlistDto) {
-    return 'This action adds a new wishlist';
+    return this.userRepository.save(createWishlistDto);
   }
 
   findAll() {
-    return `This action returns all wishlists`;
+    return this.userRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} wishlist`;
+    return this.userRepository.findOneBy({ id });
   }
 
   update(id: number, updateWishlistDto: UpdateWishlistDto) {
-    return `This action updates a #${id} wishlist`;
+    return this.userRepository.update(id, updateWishlistDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} wishlist`;
+    return this.userRepository.delete(id);
   }
 }

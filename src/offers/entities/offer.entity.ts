@@ -6,8 +6,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { IsDate, IsNumber, IsUrl } from 'class-validator';
+import { IsDate, IsNumber } from 'class-validator';
 import { User } from '../../users/entities/user.entity';
+import { Wish } from '../../wishes/entities/wish.entity';
 
 @Entity()
 export class Offer {
@@ -25,9 +26,8 @@ export class Offer {
   @ManyToOne(() => User, (user) => user.offers)
   user: User;
 
-  @Column()
-  @IsUrl()
-  item: string;
+  @ManyToOne(() => Wish, (wish) => wish.offers)
+  item: Wish;
 
   @Column()
   @IsNumber()

@@ -12,22 +12,22 @@ export class WishesService {
     private userRepository: Repository<Wish>,
   ) {}
   create(createWishDto: CreateWishDto) {
-    return 'This action adds a new wish';
+    return this.userRepository.save(createWishDto);
   }
 
   findAll() {
-    return `This action returns all wishes`;
+    return this.userRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} wish`;
+    return this.userRepository.findOneBy({ id });
   }
 
   update(id: number, updateWishDto: UpdateWishDto) {
-    return `This action updates a #${id} wish`;
+    return this.userRepository.update(id, updateWishDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} wish`;
+    return this.userRepository.delete(id);
   }
 }

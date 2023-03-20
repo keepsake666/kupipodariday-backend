@@ -12,22 +12,22 @@ export class OffersService {
     private userRepository: Repository<Offer>,
   ) {}
   create(createOfferDto: CreateOfferDto) {
-    return 'This action adds a new offer';
+    return this.userRepository.save(createOfferDto);
   }
 
   findAll() {
-    return `This action returns all offers`;
+    return this.userRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} offer`;
+    return this.userRepository.findOneBy({ id });
   }
 
   update(id: number, updateOfferDto: UpdateOfferDto) {
-    return `This action updates a #${id} offer`;
+    return this.userRepository.update(id, updateOfferDto);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} offer`;
+    return this.userRepository.delete(id);
   }
 }

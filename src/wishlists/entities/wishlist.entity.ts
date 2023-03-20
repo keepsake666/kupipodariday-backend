@@ -2,12 +2,15 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { IsDate, IsEmail, IsUrl, Length } from 'class-validator';
 import { User } from '../../users/entities/user.entity';
+import { Wish } from '../../wishes/entities/wish.entity';
 
 @Entity()
 export class Wishlist {
@@ -38,6 +41,7 @@ export class Wishlist {
   @IsEmail()
   owner: User;
 
-  @Column('text', { array: true })
-  items: string[];
+  @ManyToMany(() => Wish, (wish) => wish.wishlist)
+  @JoinTable()
+  items: Wish[];
 }

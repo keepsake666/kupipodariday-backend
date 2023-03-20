@@ -26,17 +26,17 @@ export class OffersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.offersService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.offersService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOfferDto: UpdateOfferDto) {
-    return this.offersService.update(+id, updateOfferDto);
+  update(@Param('id') id: number, @Body() updateOfferDto: UpdateOfferDto) {
+    return this.offersService.update(id, updateOfferDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.offersService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.offersService.remove(id);
   }
 }

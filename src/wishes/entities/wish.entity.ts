@@ -2,19 +2,16 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import {
-  IsDate,
-  IsEmail,
-  IsInt,
-  IsNumber,
-  IsUrl,
-  Length,
-} from 'class-validator';
+import { IsDate, IsInt, IsNumber, IsUrl, Length } from 'class-validator';
 import { User } from '../../users/entities/user.entity';
+import { Offer } from '../../offers/entities/offer.entity';
+import { Wishlist } from '../../wishlists/entities/wishlist.entity';
 
 @Entity()
 export class Wish {
@@ -50,17 +47,19 @@ export class Wish {
   raised: number;
 
   @ManyToOne(() => User, (user) => user.wishes)
-  @IsEmail()
   owner: User;
 
   @Column()
   @Length(1, 1024)
   description: string;
 
-  @Column('text', { array: true })
-  offers: string[];
+  @OneToMany(() => Offer, (offer) => offer.item)
+  offers: Offer[];
 
   @Column()
   @IsInt()
   copied: number;
+
+  @ManyToMany(() => Wishlist, (wishlist) => wishlist.items)
+  wishlist: Wishlist[];
 }
