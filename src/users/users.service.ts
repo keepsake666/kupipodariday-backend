@@ -11,10 +11,16 @@ export class UsersService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
-  create(userDto: CreateUserDto) {
-    return this.userRepository.save(userDto);
-  }
+  async create(userDto: CreateUserDto) {
+    const user = await this.userRepository.create(userDto);
 
+    return this.userRepository.save(user);
+  }
+  async findByUsername(username: string) {
+    const user = await this.userRepository.findOneBy({ username });
+
+    return user;
+  }
   findAll() {
     return this.userRepository.find();
   }
