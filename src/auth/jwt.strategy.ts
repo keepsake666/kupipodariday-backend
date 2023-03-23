@@ -5,11 +5,10 @@ import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private configService: ConfigService,
-    private usersService: UsersService,
-  ) {
+  constructor(private usersService: UsersService) {
+    const configService = new ConfigService();
     super({
+      configService: ConfigService,
       /* Указываем, что токен будет передаваться в заголовке Authorization в формате Bearer <token> */
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       /* Получаем секрет для подписи JWT токенов из конфигурации */

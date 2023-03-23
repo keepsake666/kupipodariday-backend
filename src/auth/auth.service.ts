@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '../users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -15,9 +15,8 @@ export class AuthService {
   }
   async validatePassword(username: string, password: string) {
     const user = await this.usersService.findByUsername(username);
-
-    /* В идеальном случае пароль обязательно должен быть захэширован */
-    if (user && user.password === password) {
+    const passwordEquals = await bcrypt.compare(password, user.password);
+    if (user && passwordEquals) {
       /* Исключаем пароль из результата */
       const { password, ...result } = user;
 

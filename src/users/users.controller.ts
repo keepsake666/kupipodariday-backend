@@ -6,10 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtGuard } from '../auth/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -20,6 +23,14 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @UseGuards(JwtGuard)
+  @Get('profile')
+  async profile(@Req() req) {
+    const user = await req.user;
+    return user;
+  }
+
+  @UseGuards(JwtGuard)
   @Get()
   findAll() {
     return this.usersService.findAll();
@@ -30,9 +41,14 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  @UseGuards(JwtGuard)
+  @Patch('profile')
+  async update(@Req() req, @Body() updateUserDto: UpdateUserDto) {
+    const userId = await req.user.id;
+    await this.usersService.update(userId, updateUserDto);
+    return {
+      message: 'Пользователь изменен',
+    };
   }
 
   @Delete(':id')
