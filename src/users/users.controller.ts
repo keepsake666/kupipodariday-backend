@@ -23,11 +23,23 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @Get('find')
+  findMany(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.findMany(
+      createUserDto.username || createUserDto.email,
+    );
+  }
+
   @UseGuards(JwtGuard)
-  @Get('profile')
+  @Get('me')
   async profile(@Req() req) {
     const user = await req.user;
-    return user;
+    return {
+      id: user.id,
+      username: user.username,
+      about: user.about,
+      email: user.email,
+    };
   }
 
   @UseGuards(JwtGuard)
@@ -42,7 +54,7 @@ export class UsersController {
   }
 
   @UseGuards(JwtGuard)
-  @Patch('profile')
+  @Patch('me')
   async update(@Req() req, @Body() updateUserDto: UpdateUserDto) {
     const userId = await req.user.id;
     await this.usersService.update(userId, updateUserDto);

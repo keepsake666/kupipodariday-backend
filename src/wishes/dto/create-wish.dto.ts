@@ -1,4 +1,5 @@
 import { IsNumber, IsString, IsUrl, Length } from 'class-validator';
+import { User } from '../../users/entities/user.entity';
 
 export class CreateWishDto {
   @IsString()
@@ -19,4 +20,5 @@ export class CreateWishDto {
   description: string;
   @IsNumber()
   copied?: number;
+  owner: User;
 }

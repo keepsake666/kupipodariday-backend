@@ -11,12 +11,13 @@ export class WishesService {
     @InjectRepository(Wish)
     private userRepository: Repository<Wish>,
   ) {}
-  create(createWishDto: CreateWishDto) {
-    return this.userRepository.save(createWishDto);
+  async create(createWishDto: CreateWishDto) {
+    const wish = await this.userRepository.save(createWishDto);
+    return wish;
   }
 
   findAll() {
-    return this.userRepository.find();
+    return this.userRepository.find({ relations: { owner: true } });
   }
 
   findOne(id: number) {

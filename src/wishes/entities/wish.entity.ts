@@ -42,9 +42,9 @@ export class Wish {
   @IsNumber()
   price: number;
 
-  @Column()
+  @Column({ default: 0 })
   @IsNumber()
-  raised: number;
+  raised?: number;
 
   @ManyToOne(() => User, (user) => user.wishes)
   owner: User;
@@ -56,7 +56,7 @@ export class Wish {
   @OneToMany(() => Offer, (offer) => offer.item)
   offers: Offer[];
 
-  @Column()
+  @Column({ default: 0 })
   @IsInt()
   copied: number;
 
