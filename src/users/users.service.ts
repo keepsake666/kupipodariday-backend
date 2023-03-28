@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { WishesService } from '../wishes/wishes.service';
+import { optionalRequire } from '@nestjs/core/helpers/optional-require';
 
 @Injectable()
 export class UsersService {
@@ -36,10 +36,9 @@ export class UsersService {
     return user;
   }
   async findMany(value: string) {
-    const user = await this.userRepository.findOneBy([
-      { username: value },
-      { email: value },
-    ]);
+    const user = await this.userRepository.findOne({
+      where: [{ username: value }, { email: value }],
+    });
     if (!user) {
       throw new HttpException(
         'Такого пользователя нет',
@@ -85,8 +84,24 @@ export class UsersService {
     const user = await this.userRepository.update(id, updateUserDto);
     return user;
   }
+  async findMyWishes(id) {
+    return await this.userRepository.findOne({
+      where: { id },
+      relations: { wishes: true },
+    });
+  }
 
-  remove(id: number) {
-    return this.userRepository.delete(id);
+  async findUserWishes(value: string) {
+    const user = await this.userRepository.findOne({
+      where: [{ username: value }, { email: value }],
+      relations: { wishes: true },
+    });
+    if (!user) {
+      throw new HttpException(
+        'Такого пользователя нет',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return user;
   }
 }

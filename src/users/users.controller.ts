@@ -1,11 +1,9 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
   Param,
-  Delete,
   UseGuards,
   Req,
 } from '@nestjs/common';
@@ -18,16 +16,10 @@ import { JwtGuard } from '../auth/jwt-auth.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
-  @Get('find')
-  findMany(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.findMany(
-      createUserDto.username || createUserDto.email,
-    );
+  @UseGuards(JwtGuard)
+  @Get(':username')
+  findMany(@Param('username') username: string) {
+    return this.usersService.findMany(username);
   }
 
   @UseGuards(JwtGuard)
@@ -48,6 +40,7 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @UseGuards(JwtGuard)
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.usersService.findOne(id);
@@ -62,9 +55,14 @@ export class UsersController {
       message: 'Пользователь изменен',
     };
   }
-
-  @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.usersService.remove(id);
+  @UseGuards(JwtGuard)
+  @Get('me/wishes')
+  async myWishes(@Req() req) {
+    const userId = await req.user.id;
+    return this.usersService.findMyWishes(userId);
+  }
+  @Get(':username/wishes')
+  async findUserWishes(@Param('username') username: string) {
+    return this.usersService.findUserWishes(username);
   }
 }
