@@ -24,7 +24,15 @@ export class WishesController {
     const user = await req.user;
     return this.wishesService.create({ ...createWishDto, owner: user });
   }
+  @Get('last')
+  getLastWishes() {
+    return this.wishesService.getLastWishes();
+  }
 
+  @Get('top')
+  getTopWishes() {
+    return this.wishesService.getTopWishes();
+  }
   @Get()
   findAll() {
     return this.wishesService.findAll();
@@ -34,14 +42,21 @@ export class WishesController {
   findOne(@Param('id') id: number) {
     return this.wishesService.findOne(+id);
   }
-
+  @UseGuards(JwtGuard)
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateWishDto: UpdateWishDto) {
-    return this.wishesService.update(id, updateWishDto);
+  async update(
+    @Param('id') id: number,
+    @Body() updateWishDto: UpdateWishDto,
+    @Req() req,
+  ) {
+    const idUser = await req.user.id;
+    return this.wishesService.update(id, updateWishDto, idUser);
   }
 
+  @UseGuards(JwtGuard)
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.wishesService.remove(id);
+  async remove(@Param('id') id: number, @Req() req) {
+    const idUser = await req.user.id;
+    return this.wishesService.remove(id, idUser);
   }
 }

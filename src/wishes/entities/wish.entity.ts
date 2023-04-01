@@ -38,11 +38,11 @@ export class Wish {
   @IsUrl()
   image: string;
 
-  @Column()
+  @Column('decimal')
   @IsNumber()
   price: number;
 
-  @Column({ default: 0 })
+  @Column('decimal', { default: 0 })
   @IsNumber()
   raised: number;
 
