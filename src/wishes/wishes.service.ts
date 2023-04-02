@@ -23,12 +23,25 @@ export class WishesService {
     return wish;
   }
 
-  findAll() {
-    return this.wishRepository.find({ relations: { owner: true } });
-  }
-
-  findOne(id: number) {
-    return this.wishRepository.findOneBy({ id });
+  async findOne(id: number, idUser) {
+    const wish = await this.wishRepository.findOne({
+      where: {
+        id,
+      },
+      relations: { owner: true, offers: true },
+    });
+    if (!wish) {
+      throw new BadRequestException('Такого подарка нет');
+    }
+    if (wish.owner.id === idUser) {
+      return wish;
+    }
+    if (wish.owner.id !== idUser) {
+      return {
+        description: wish.description,
+        offers: wish.offers,
+      };
+    }
   }
 
   async update(id: number, updateWishDto: UpdateWishDto, idUser) {
@@ -81,6 +94,23 @@ export class WishesService {
     return this.wishRepository.delete(id);
   }
 
+  async copyWish(id: number, idUser) {
+    const wish = await this.wishRepository.findOne({ where: { id } });
+    if (!wish) throw new BadRequestException('Такого подарка нет');
+    const user = await this.userRepository.findOne({
+      where: { id: idUser },
+      relations: { wishes: true },
+    });
+    const isWishHas = user.wishes.some((item) => item.id === wish.id);
+    if (!isWishHas) {
+      const newWish = this.wishRepository.create(wish);
+      newWish.owner = user;
+      wish.copied += 1;
+      await this.wishRepository.save(wish);
+      await this.wishRepository.insert(newWish);
+    }
+    return user;
+  }
 
   getLastWishes() {
     return this.wishRepository.find({

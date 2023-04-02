@@ -6,18 +6,23 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { WishlistsService } from './wishlists.service';
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
+import { JwtGuard } from '../auth/jwt-auth.guard';
 
 @Controller('wishlists')
+@UseGuards(JwtGuard)
 export class WishlistsController {
   constructor(private readonly wishlistsService: WishlistsService) {}
 
   @Post()
-  create(@Body() createWishlistDto: CreateWishlistDto) {
-    return this.wishlistsService.create(createWishlistDto);
+  async create(@Body() createWishlistDto: CreateWishlistDto, @Req() req) {
+    const idUser = await req.user.id;
+    return this.wishlistsService.create(createWishlistDto, idUser);
   }
 
   @Get()
@@ -30,13 +35,13 @@ export class WishlistsController {
     return this.wishlistsService.findOne(id);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: number,
-    @Body() updateWishlistDto: UpdateWishlistDto,
-  ) {
-    return this.wishlistsService.update(id, updateWishlistDto);
-  }
+  // @Patch(':id')
+  // update(
+  //   @Param('id') id: number,
+  //   @Body() updateWishlistDto: UpdateWishlistDto,
+  // ) {
+  //   return this.wishlistsService.update(id, updateWishlistDto);
+  // }
 
   @Delete(':id')
   remove(@Param('id') id: number) {

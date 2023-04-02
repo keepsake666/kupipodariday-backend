@@ -33,14 +33,12 @@ export class WishesController {
   getTopWishes() {
     return this.wishesService.getTopWishes();
   }
-  @Get()
-  findAll() {
-    return this.wishesService.findAll();
-  }
 
+  @UseGuards(JwtGuard)
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.wishesService.findOne(+id);
+  async findOne(@Param('id') id: number, @Req() req) {
+    const idUser = await req.user.id;
+    return this.wishesService.findOne(id, idUser);
   }
   @UseGuards(JwtGuard)
   @Patch(':id')
@@ -58,5 +56,10 @@ export class WishesController {
   async remove(@Param('id') id: number, @Req() req) {
     const idUser = await req.user.id;
     return this.wishesService.remove(id, idUser);
+  }
+  @Post(':id/copy')
+  @UseGuards(JwtGuard)
+  copy(@Param('id') id: number, @Req() req) {
+    return this.wishesService.copyWish(id, req.user.id);
   }
 }

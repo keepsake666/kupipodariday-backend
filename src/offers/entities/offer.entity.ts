@@ -29,7 +29,7 @@ export class Offer {
   @ManyToOne(() => Wish, (wish) => wish.offers)
   item: Wish;
 
-  @Column()
+  @Column('decimal')
   @IsNumber()
   amount: number;
 
