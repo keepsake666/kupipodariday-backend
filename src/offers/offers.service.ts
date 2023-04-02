@@ -22,6 +22,7 @@ export class OffersService {
     });
     if (!wish) throw new BadRequestException('Такого подарка нет');
     const user = await this.userRepository.findOne({
+      relations: { wishes: true },
       where: { id: idUser },
     });
     const offer = await this.offersRepository.save(createOfferDto);

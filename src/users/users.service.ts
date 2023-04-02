@@ -35,9 +35,9 @@ export class UsersService {
 
     return user;
   }
-  async findMany(value: string) {
+  async findMany(query: string) {
     const user = await this.userRepository.findOne({
-      where: [{ username: value }, { email: value }],
+      where: [{ username: query }, { email: query }],
     });
     if (!user) {
       throw new HttpException(
@@ -45,23 +45,21 @@ export class UsersService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    return user;
+    return { ...user, password: undefined };
   }
   async findAll() {
     const users = await this.userRepository.find({
+      select: { id: true, username: true, about: true },
       relations: { wishes: true },
     });
-    const usersInfo = users.map((item) => {
-      return {
-        username: item.username,
-        avatar: item.avatar,
-        about: item.about,
-        wishes: item.wishes,
-      };
-    });
-    return usersInfo;
+
+    return users;
   }
 
+  async findMe(id: number) {
+    const user = await this.userRepository.findOneBy({ id });
+    return { ...user, password: undefined };
+  }
   async findOne(id: number) {
     const user = await this.userRepository.findOneBy({ id });
     return {
@@ -75,20 +73,23 @@ export class UsersService {
   async update(id: number, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
       const passwordHash = await bcrypt.hash(updateUserDto.password, 5);
-      const user = await this.userRepository.update(id, {
+      await this.userRepository.update(id, {
         ...updateUserDto,
         password: passwordHash,
       });
-      return user;
+      const user = await this.userRepository.findOneBy({ id });
+      return { ...user, password: undefined };
     }
-    const user = await this.userRepository.update(id, updateUserDto);
-    return user;
+    await this.userRepository.update(id, updateUserDto);
+    const user = await this.userRepository.findOneBy({ id });
+    return { ...user, password: undefined };
   }
   async findMyWishes(id) {
-    return await this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: { id },
       relations: { wishes: true },
     });
+    return user.wishes;
   }
 
   async findUserWishes(value: string) {
@@ -102,6 +103,6 @@ export class UsersService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    return user;
+    return user.wishes;
   }
 }

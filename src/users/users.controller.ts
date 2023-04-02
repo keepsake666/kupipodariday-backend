@@ -5,7 +5,7 @@ import {
   Patch,
   Param,
   UseGuards,
-  Req,
+  Req, Post,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,21 +17,10 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @UseGuards(JwtGuard)
-  @Get(':username')
-  findMany(@Param('username') username: string) {
-    return this.usersService.findMany(username);
-  }
-
-  @UseGuards(JwtGuard)
   @Get('me')
   async profile(@Req() req) {
-    const user = await req.user;
-    return {
-      id: user.id,
-      username: user.username,
-      about: user.about,
-      email: user.email,
-    };
+    const userId = await req.user.id;
+    return this.usersService.findMe(userId);
   }
 
   @UseGuards(JwtGuard)
@@ -40,6 +29,11 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @UseGuards(JwtGuard)
+  @Post('find')
+  findMany(@Body('query') query: string) {
+    return this.usersService.findMany(query);
+  }
   @UseGuards(JwtGuard)
   @Get(':id')
   findOne(@Param('id') id: number) {
@@ -50,10 +44,7 @@ export class UsersController {
   @Patch('me')
   async update(@Req() req, @Body() updateUserDto: UpdateUserDto) {
     const userId = await req.user.id;
-    await this.usersService.update(userId, updateUserDto);
-    return {
-      message: 'Пользователь изменен',
-    };
+    return this.usersService.update(userId, updateUserDto);
   }
   @UseGuards(JwtGuard)
   @Get('me/wishes')
