@@ -19,8 +19,7 @@ export class WishesService {
     private userRepository: Repository<User>,
   ) {}
   async create(createWishDto: CreateWishDto) {
-    const wish = await this.wishRepository.save(createWishDto);
-    return wish;
+    return await this.wishRepository.save(createWishDto);
   }
 
   async findOne(id: number, idUser) {
@@ -62,10 +61,6 @@ export class WishesService {
 
     if (wish) await this.wishRepository.update(id, updateWishDto);
     return this.wishRepository.findOne({
-      relations: {
-        offers: true,
-        owner: true,
-      },
       where: {
         id,
       },
@@ -87,11 +82,10 @@ export class WishesService {
     if (!wish)
       throw new BadRequestException('Чужой подарок или такого подарка нет');
     try {
-      return this.wishRepository.remove(wish);
+      return await this.wishRepository.remove(wish);
     } catch (err) {
       throw new ConflictException('На подарок уже скинулись');
     }
-    return this.wishRepository.delete(id);
   }
 
   async copyWish(id: number, idUser) {
@@ -101,15 +95,15 @@ export class WishesService {
       where: { id: idUser },
       relations: { wishes: true },
     });
-    const isWishHas = user.wishes.some((item) => item.id === wish.id);
-    if (!isWishHas) {
+    const wishHas = user.wishes.some((item) => item.id === wish.id);
+    if (!wishHas) {
       const newWish = this.wishRepository.create(wish);
       newWish.owner = user;
       wish.copied += 1;
       await this.wishRepository.save(wish);
       await this.wishRepository.insert(newWish);
     }
-    return user;
+    return user.wishes;
   }
 
   getLastWishes() {

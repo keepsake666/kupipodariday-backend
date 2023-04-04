@@ -29,7 +29,7 @@ export class OffersService {
     //проверка на свой подарок
     const userWish = user.wishes.some((item) => item.id === wish.id);
     if (!userWish) {
-      offer.user = user;
+      offer.user = { ...user, password: undefined, email: undefined };
       offer.item = wish;
       wish.raised = Number(wish.raised) + createOfferDto.amount;
       if (wish.raised > wish.price)
@@ -40,12 +40,13 @@ export class OffersService {
     throw new BadRequestException('На свой подарок скинуться невозможно');
   }
 
-  findAll() {
-    return this.offersRepository.find({
+  async findAll() {
+    return await this.offersRepository.find({
       relations: {
         user: true,
         item: true,
       },
+      select: {},
     });
   }
 

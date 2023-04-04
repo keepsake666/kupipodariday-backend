@@ -23,12 +23,11 @@ export class WishlistsService {
       id: item,
     }));
     const wishes = await this.wishRepository.find({ where: items });
-    const wishlist = await this.wishlistRepository.save({
+    return await this.wishlistRepository.save({
       ...createWishlistDto,
       owner: user,
       items: wishes,
     });
-    return wishlist;
   }
 
   findAll() {

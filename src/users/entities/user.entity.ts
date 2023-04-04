@@ -36,11 +36,11 @@ export class User {
   @IsUrl()
   avatar: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, select: false })
   @IsEmail()
   email: string;
 
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @OneToMany(() => Wish, (wish) => wish.owner)

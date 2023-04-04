@@ -13,23 +13,23 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsString()
   @Length(2, 30)
   @IsOptional()
-  username?: string;
+  username: string;
 
   @IsString()
   @Length(2, 200)
   @IsOptional()
-  about?: string;
+  about: string;
 
   @IsString()
   @IsUrl()
   @IsOptional()
-  avatar?: string;
+  avatar: string;
 
   @IsEmail()
   @IsOptional()
-  email?: string;
+  email: string;
 
   @IsNotEmpty()
   @IsOptional()
-  password?: string;
+  password: string;
 }

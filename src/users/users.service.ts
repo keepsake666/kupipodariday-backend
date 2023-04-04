@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { optionalRequire } from '@nestjs/core/helpers/optional-require';
 
 @Injectable()
 export class UsersService {
@@ -31,9 +30,17 @@ export class UsersService {
     return this.userRepository.save(user);
   }
   async findByUsername(username: string) {
-    const user = await this.userRepository.findOneBy({ username });
-
-    return user;
+    return await this.userRepository.findOne({
+      where: { username },
+      select: {
+        password: true,
+        email: true,
+        id: true,
+        username: true,
+        about: true,
+        avatar: true,
+      },
+    });
   }
   async findMany(query: string) {
     const user = await this.userRepository.findOne({
@@ -45,29 +52,23 @@ export class UsersService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    return { ...user, password: undefined };
-  }
-  async findAll() {
-    const users = await this.userRepository.find({
-      select: { id: true, username: true, about: true },
-      relations: { wishes: true },
-    });
-
-    return users;
+    return user;
   }
 
   async findMe(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
-    return { ...user, password: undefined };
+    return await this.userRepository.findOne({
+      where: { id },
+      select: {
+        email: true,
+        id: true,
+        username: true,
+        about: true,
+        avatar: true,
+      },
+    });
   }
   async findOne(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
-    return {
-      id: user.id,
-      username: user.username,
-      about: user.about,
-      avatar: user.avatar,
-    };
+    return await this.userRepository.findOneBy({ id });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
@@ -77,12 +78,10 @@ export class UsersService {
         ...updateUserDto,
         password: passwordHash,
       });
-      const user = await this.userRepository.findOneBy({ id });
-      return { ...user, password: undefined };
+      return await this.userRepository.findOneBy({ id });
     }
     await this.userRepository.update(id, updateUserDto);
-    const user = await this.userRepository.findOneBy({ id });
-    return { ...user, password: undefined };
+    return await this.userRepository.findOneBy({ id });
   }
   async findMyWishes(id) {
     const user = await this.userRepository.findOne({
@@ -104,5 +103,8 @@ export class UsersService {
       );
     }
     return user.wishes;
+  }
+  async findUserName(username: string) {
+    return await this.userRepository.findOneBy({ username });
   }
 }
