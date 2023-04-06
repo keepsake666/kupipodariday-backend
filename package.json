@@ -2,7 +2,7 @@
   "name": "kupipodariday-backend",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "veselov",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -44,7 +44,7 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
     "typeorm": "^0.3.7",
-    "webpack": "^5.77.0",
+    "webpack": "^5.78.0",
     "winston": "^3.8.2"
   },
   "devDependencies": {

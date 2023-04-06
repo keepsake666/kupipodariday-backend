@@ -36,8 +36,8 @@ export class WishlistsService {
     });
   }
 
-  findOne(id: number) {
-    return this.wishlistRepository.findOne({
+  async findOne(id: number) {
+    const wishlist = await this.wishlistRepository.findOne({
       relations: {
         items: true,
         owner: true,
@@ -46,6 +46,10 @@ export class WishlistsService {
         id,
       },
     });
+    if (!wishlist) {
+      throw new BadRequestException('Такой подборки нет или неверный id');
+    }
+    return wishlist;
   }
 
   async update(
@@ -56,6 +60,7 @@ export class WishlistsService {
     const wishList = await this.wishlistRepository.findOne({
       relations: {
         owner: true,
+        items: true,
       },
       where: {
         id,
@@ -88,6 +93,7 @@ export class WishlistsService {
     const wishList = await this.wishlistRepository.findOne({
       relations: {
         owner: true,
+        items: true,
       },
       where: {
         id,
@@ -97,7 +103,7 @@ export class WishlistsService {
       },
     });
     if (!wishList)
-      throw new BadRequestException('Чужая подарка или такой подарки нет');
-    if (wishList) await this.wishlistRepository.remove(wishList);
+      throw new BadRequestException('Чужая подборка или такой подборки нет');
+    if (wishList) return await this.wishlistRepository.remove(wishList);
   }
 }

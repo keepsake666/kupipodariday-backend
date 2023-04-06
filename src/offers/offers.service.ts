@@ -35,7 +35,8 @@ export class OffersService {
       if (wish.raised > wish.price)
         throw new BadRequestException('Сумма больше необходимой');
       await this.wishRepository.save(wish);
-      return this.offersRepository.save(offer);
+      await this.offersRepository.save(offer);
+      return { message: 'Вы успешно скинулись на подарок' };
     }
     throw new BadRequestException('На свой подарок скинуться невозможно');
   }
@@ -46,7 +47,6 @@ export class OffersService {
         user: true,
         item: true,
       },
-      select: {},
     });
   }
 

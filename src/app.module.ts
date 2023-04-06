@@ -29,7 +29,7 @@ import { APP_GUARD } from '@nestjs/core';
       password: process.env.PASSWORD || 'student',
       database: process.env.DATA_BASE || 'nest_project',
       entities: [User, Offer, Wishlist, Wish],
-      synchronize: true,
+      synchronize: Boolean(process.env.SYNCHRONIZE) || true,
     }),
     WinstonModule.forRoot({
       levels: {

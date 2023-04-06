@@ -5,12 +5,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { Wish } from '../wishes/entities/wish.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Wish)
+    private wishRepository: Repository<Wish>,
   ) {}
   async create(userDto: CreateUserDto) {
     const newUser = await this.findByUsername(userDto.username);
@@ -45,6 +48,15 @@ export class UsersService {
   async findMany(query: string) {
     const user = await this.userRepository.findOne({
       where: [{ username: query }, { email: query }],
+      select: {
+        id: true,
+        avatar: true,
+        username: true,
+        about: true,
+        email: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
     if (!user) {
       throw new HttpException(
@@ -59,11 +71,13 @@ export class UsersService {
     return await this.userRepository.findOne({
       where: { id },
       select: {
-        email: true,
         id: true,
+        email: true,
         username: true,
         about: true,
         avatar: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
   }
@@ -81,20 +95,27 @@ export class UsersService {
       return await this.userRepository.findOneBy({ id });
     }
     await this.userRepository.update(id, updateUserDto);
-    return await this.userRepository.findOneBy({ id });
-  }
-  async findMyWishes(id) {
-    const user = await this.userRepository.findOne({
+    return await this.userRepository.findOne({
       where: { id },
-      relations: { wishes: true },
+      select: {
+        username: true,
+        about: true,
+        avatar: true,
+        email: true,
+      },
     });
-    return user.wishes;
+  }
+
+  async findMyWishes(id) {
+    return await this.wishRepository.find({
+      where: { owner: { id: id } },
+      relations: { offers: true, owner: true, wishlist: true },
+    });
   }
 
   async findUserWishes(value: string) {
     const user = await this.userRepository.findOne({
       where: [{ username: value }, { email: value }],
-      relations: { wishes: true },
     });
     if (!user) {
       throw new HttpException(
@@ -102,7 +123,10 @@ export class UsersService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    return user.wishes;
+    return await this.wishRepository.find({
+      where: { owner: [{ username: value }, { email: value }] },
+      relations: { offers: true, owner: true, wishlist: true },
+    });
   }
   async findUserName(username: string) {
     return await this.userRepository.findOneBy({ username });
